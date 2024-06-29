@@ -7,6 +7,7 @@ import { BiMap } from 'react-icons/bi'
 
 import { InputTextForms } from "../template/input";
 import axios from "axios";
+import Pagination from "../template/pagination";
 
 const customStyles = {
     content: {
@@ -33,6 +34,7 @@ interface Address {
     street?: string | null;
     number?: number | null;
     complement?: string | null;
+    neighborhood?: string | null;
 }
 
 const initialData: Address = {
@@ -53,7 +55,11 @@ export default function AddressesList({
 
     const [modalIsOpen, setModalIsOpen] = useState(false)
     const [addresses, setAddresses] = useState<Address[]>([])
+    const [address, setAddress] = useState<Address>({})
+    const [addressExist, setAddressExist] = useState(false)
     const [searchValue, setSearchValue] = useState('')
+    const [currentPage, setCurrentPage] = useState(1)
+    const [total, setTotal] = useState(0)
     const [inputsToggler, setInputsToggler] = useState(
         {
             commom: true,
@@ -67,7 +73,7 @@ export default function AddressesList({
     const searchClient = async () => {
 
         try {
-            const response = await axios.get(`${process.env.BEK_URL}/address/search`, {
+            const response = await axios.get(`http://localhost/address/search`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -75,17 +81,19 @@ export default function AddressesList({
                 params: {
                     name: searchValue,
                     perPage: 10,
-                    page: 1
+                    page: currentPage
                 }
             })
                 .then(function (response) {
-                    setAddresses(response.data.addresses)
+                    console.log('response.data')
+                    setTotal(response.data.client.total)
+                    setAddresses(response.data.client.data)
                 })
                 .catch(function (error) {
-                    
+
                 })
                 .finally(function () {
-                    // always executed
+                    
                 });
         } catch (error) {
             console.error(error);
@@ -109,35 +117,43 @@ export default function AddressesList({
     }, []);
 
     useEffect(() => {
-        console.log('addresses')
-        console.log(addresses)
-    }, [addresses]);
+        console.log('address exists')
+        console.log(modalIsOpen)
+    }, [modalIsOpen]);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const handleAddress = (a: Address) => {
+        setAddress(a)
+        setAddressExist(true)
+        setModalIsOpen(false)
+    };
+
+    const removeAddress = () => {
+        setAddress({});
+        setAddressExist(false)
+    };
 
     return (
         <div onKeyDown={handleKeyDown} >
-            <div className="flex flex-col items-center justify-items-center border border-gray-100 rounded-lg content-center p-4 gap-3 mb-3">
+            <div className="flex flex-row items-center justify-items-center content-center border border-gray-100 rounded-lg content-center p-4 gap-3 mb-3">
                 {
-                    addresses.length > 0 ?
-                        <ul id={'addresses'} className="flex flex-col w-full p-4">
-                            {
-                                addresses.map((a, b) => (
-                                    <li key={'key-bottom-' + b} className="flex flex-row text-4xl">
-                                        <span className="flex w-10/12">
-                                            <span className='flex rounded mr-3 h-10 w-10 bg-gray-700 mt-1' />
-                                        </span>
-                                        <span className="flex w-2/12 mp-1">
-                                            <BtnS onClick={()=>{}}  >
-                                                <AiOutlineUsergroupAdd />
-                                            </BtnS>
-                                        </span>
-                                    </li>
-                                ))
-                            }
-                        </ul>
-                        :
-                        <span className="flex flex-col items-center justify-items-center content-center ">
+                    addressExist?
+                        <div className="flex justify-between items-center flex-row w-full p-4">
+                            <span className="text-blue-500">
+                                <BiMap style={{fontSize: 25}}/>
+                            </span> 
+                            <span style={{fontSize: 19}}>
+                                { address.street + ' , ' + address.number + ' , ' + address.neighborhood + ' , ' + address.CEP } 
+                            </span> 
+                            <BtnR onClick={() => removeAddress()}><AiOutlineCloseCircle style={{ fontSize: '24px', marginTop: '8px' }} /></BtnR>
+                        </div>
+                    :
+                        <span className="flex flex-col items-center justify-items-center content-center mr-auto ml-auto">
                             <FiAlertTriangle className="text-2xl mb-3" />
-                            <h1 className="uppercase mb-3 text-lg"> Nenhum <b>endereço</b> selecionado </h1>
+                            <h1 className=" mb-3 text-lg"> Nenhum <b>endereço</b> selecionado </h1>
                             <BtnOutline onClick={() => toggleModaladdresses()}>selecionar endereço</BtnOutline>
                         </span>
                 }
@@ -171,20 +187,20 @@ export default function AddressesList({
                                         {addresses.map((a, b) => (
                                             <li key={'key-bottom-' + b} className="flex flex-row w-full text-4xl">
                                                 <span className='md:w-1/12 flex mt-1'>
-                                                    <BiMap className="text-gray-400" style={{ fontSize: 35}} />
+                                                    <BiMap className="text-gray-400" style={{ fontSize: 35 }} />
                                                 </span>
-                                                <span className='md:w-9/12 flex mt-1' style={{ fontSize: 18}}>
-                                                    { a.street + ' ' }
+                                                <span className='md:w-9/12 flex mt-1' style={{ fontSize: 18 }}>
+                                                    {a.street + ' '}
                                                     ,
-                                                    { a.CEP + ' ' }
+                                                    {a.CEP + ' '}
                                                     ,
-                                                    { a.complement + ' ' }
+                                                    {a.complement + ' '}
                                                     ,
-                                                    { a.number + ' ' }
+                                                    {a.number + ' '}
                                                 </span>
                                                 <div className="md:w-2/12">
-                                                    <BtnR onClick={() => {}} >
-                                                        <AiOutlineUsergroupAdd style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: 4 }} /> 
+                                                    <BtnR onClick={() => handleAddress(a)} >
+                                                        <AiOutlineUsergroupAdd style={{ marginLeft: 'auto', marginRight: 'auto', marginTop: 4 }} />
                                                     </BtnR>
                                                 </div>
                                             </li>
@@ -195,6 +211,17 @@ export default function AddressesList({
                             </ul>
                             :
                             null
+                    }
+                    {
+                        addresses.length > 0 ?
+                            <ul className="flex flex flex-col p-4 gap-3 rounded mb-5 mt-5">
+                                <Pagination
+                                    currentPage={currentPage}
+                                    totalPages={total === 1 ? 1 : (Math.ceil(total / 10))}
+                                    onPageChange={handlePageChange}
+                                /> 
+                            </ul>
+                        : null
                     }
                 </div>
             </Modal>

@@ -32,7 +32,7 @@ export function CheckBox({
             />
             <label
                 htmlFor={id}
-                className="ml-2 text-sm font-medium uppercase text-bold"
+                className="ml-2 text-sm font-medium  text-bold"
                 style={{ color: '#1d4ed8' }}
             >
                 {label}

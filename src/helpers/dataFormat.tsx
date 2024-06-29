@@ -1,9 +1,8 @@
 export default function transformDateFormat(dateString: string) {
-  const parts = dateString.split('-');
-  if (parts.length !== 3) {
-    throw new Error('Formato de data inválido. Deve ser "AAAA-MM-DD".');
-  }
+  const date = new Date(dateString);
+  const day = date.getUTCDate();
+  const month = date.getUTCMonth() + 1; // Os meses em JavaScript são baseados em zero
+  const year = date.getUTCFullYear();
 
-  const [year, month, day] = parts;
-  return `${day}-${month}-${year}`;
+  return `${day < 10 ? '0' : ''}${day}-${month < 10 ? '0' : ''}${month}-${year}`;
 }

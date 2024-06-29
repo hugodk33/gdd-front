@@ -77,7 +77,7 @@ export default function clientsList({
 
     const searchClient = async () => {
         try {
-            const response = await axios.get(`${process.env.BEK_URL}/clients/search`, {
+            const response = await axios.get(`http://localhost/clients/search`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -159,7 +159,7 @@ export default function clientsList({
                                         <li key={'key-bottom-' + b} className="flex flex-row text-4xl h-24">
                                             <div className="flex flex-col md:w-7/12 pt-5">
                                                 <span className='text-2xl'> {a.kin?.name}</span>
-                                                <span className='text-sm uppercase font-semibold'>{"CPF:" + a.kin?.CPF + " | " + "RG:" + a.kin?.RG} </span>
+                                                <span className='text-sm  font-semibold'>{"CPF:" + a.kin?.CPF + " | " + "RG:" + a.kin?.RG} </span>
                                             </div>
                                             <div className="flex flex-col md:w-4/12 text-center pr-2 pl-2">
                                                 <span>parentesco</span>
@@ -179,7 +179,7 @@ export default function clientsList({
                         :
                         <span className="flex flex-col items-center justify-items-center content-center ">
                             <FiAlertTriangle className="text-2xl mb-3" />
-                            <h1 className="uppercase mb-3 text-center text-lg"> Nenhum <b>parente</b> selecionado </h1>
+                            <h1 className=" mb-3 text-center text-lg"> Nenhum <b>parente</b> selecionado </h1>
                         </span>
                 }
                 <hr />
@@ -223,7 +223,7 @@ export default function clientsList({
                                                 <li key={'key-bottom-' + b} className="flex flex-row text-4xl">
                                                     <div className="flex flex-col md:w-11/12">
                                                         <span className='text-2xl'> {a.name}</span>
-                                                        <span className='text-sm uppercase font-semibold'>{"CPF:" + a.CPF + " | " + "RG:" + a.RG} </span>
+                                                        <span className='text-sm  font-semibold'>{"CPF:" + a.CPF + " | " + "RG:" + a.RG} </span>
                                                     </div>
                                                     <div className="flex flex-row-reverse md:w-1/12">
                                                         <BtnR onClick={() => handleKinship(a)} >

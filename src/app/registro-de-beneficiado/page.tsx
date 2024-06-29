@@ -10,10 +10,9 @@ import { InputCalendarForm, InputSelect, InputTextArea, InputTextForms } from '@
 import { Btn, BtnR } from '@/components/template/btn'
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { ModalSm } from '@/components/template/modal';
+import { ModalCTN, ModalSm } from '@/components/template/modal';
 import { FiAlertTriangle } from 'react-icons/fi';
-import AddressesList from '@/components/sections/addressesList';
-import ClientsParentsList from '@/components/sections/clientParentList';
+import AuthCheck from '@/components/authCheck/authcheck';
 
 const today = new Date();
 const year = today.getFullYear();
@@ -22,7 +21,7 @@ const day = String(today.getDate()).padStart(2, '0');
 const formattedDate = `${year}-${month}-${day}`;
 
 interface Client {
-  client_id?: number | null;
+  client_id?: number | null | undefined;
   name?: string | null;
   birthday?: string | null;
   RG?: number | null;
@@ -30,7 +29,15 @@ interface Client {
   phone?: number | null;
   email?: string | null;
   maritial_status?: string | null;
-  address?: number | null;
+  family?: string | null;
+  already?: string | null;
+  welfare_state?: string | null;
+  street?: string | null;
+  number?: string | null;
+  neighborhood?: string | null;
+  CEP?: string | null;
+  mother_name?: string | null;
+  reference?: string | null;
 }
 
 interface KinshipList {
@@ -41,32 +48,81 @@ interface KinshipList {
 }
 
 type DataForm = {
-  name: string | null;
-  birthday: string | null;
-  RG: number | null;
-  CPF: number | null;
-  maritial_status: string | number | null | undefined;
-  kinship: number | null;
-  email: string | null;
-  phone: number | null;
-  kinships: KinshipList[];
-  user: number;
+  name?: string | null;
+  birthday?: string | null;
+  RG?: number | null | string;
+  CPF?: number | null | string;
+  maritial_status?: string | number | null | undefined;
+  email?: string | null;
+  phone?: number | null | string;
+  user?: number | string | null;
+  genre?: string | null;
+  family?: string | null;
+  already?: string | null;
+  welfare_state?: string | null;
+  welfare_state_type?: string | null;
+  street?: string | null;
+  number?: string | null | string;
+  neighborhood?: string | null;
+  CEP?: string | null;
+  mother_name?: string | null;
+  reference?: string | null;
+  complement?: string | null;
+  state?: string | null;
+  city?: string | null;
 };
 
 const initialData: DataForm = {
-  name: null,
-  birthday: null,
-  RG: null,
-  CPF: null,
-  maritial_status: 'solteiro(a)',
-  kinship: null,
-  email: null,
-  phone: null,
-  kinships: [],
-  user: 1
+  name: '',
+  birthday: '',
+  RG: '',
+  CPF: '',
+  maritial_status: '',
+  email: '',
+  phone: '',
+  user: '',
+  genre: '',
+  family: '',
+  already: '',
+  welfare_state: '',
+  welfare_state_type: '',
+  street: '',
+  number: '',
+  neighborhood: '',
+  CEP: '',
+  mother_name: '',
+  reference: '',
+  complement: '',
+  state: '',
+  city: ''
+};
+
+const initialDataSanitize: DataForm = {
+  name: '',
+  birthday: '',
+  RG: '',
+  CPF: '',
+  maritial_status: '',
+  email: '',
+  phone: '',
+  user: 1,
+  genre: '',
+  family: '',
+  already: '',
+  welfare_state: '',
+  street: '',
+  number: '',
+  neighborhood: '',
+  CEP: '',
+  mother_name: '',
+  reference: '',
+  complement: '',
+  state: '',
+  city: ''
 };
 
 const maritial_status_options = [
+  { value: '', label: '' },
   { value: 'solteiro(a)', label: 'solteiro(a)' },
   { value: 'casado(a)', label: 'casado(a)' },
   { value: 'divorciado(a)', label: 'divorciado(a)' },
@@ -74,11 +130,13 @@ const maritial_status_options = [
 ];
 
 const genre_options = [
+  { value: '', label: '' },
   { value: 'masculino', label: 'masculino' },
   { value: 'feminino', label: 'feminino' }
 ];
 
-const welfarestate_status_options = [
+const welfarestate_status_option = [
+  { value: '', label: '' },
   { value: 'sim', label: 'sim' },
   { value: 'não', label: 'não' }
 ];
@@ -88,10 +146,19 @@ export default function ClientRegister() {
   const [dataForm, setDataForm] = useState<DataForm>(initialData)
   const [alertModalSucess, setAlertModalSuccess] = useState(false)
   const [alertModalError, setAlertModalError] = useState(false)
+  const [clientsToDestroy, setClientsToDestroy] = useState<any>()
   const [selectedClientKinships, setSelectedClientKinships] = useState<KinshipList[]>([]);
-  const [selectedClientKinshipsSendForm, setSelectedClientKinshipsSendForm] = useState([]);
+  const [message, setMessage] = useState('')
+  const [modalMessage, setModalMessage] = useState('');
+  const [isOpen, setIsOpen] = useState(false)
+  const [sanitize, setSanitize] = useState(false)
+  const [fieldsUpdated, setFieldsUpdated] = useState(0);
+  const [localStorageValues, setLocalStorageValues] = useState(false);
+  const [localStorageUserId, setLocalStorageUserId] = useState('');
 
   const sendForm = async () => {
+    let token = localStorage.getItem('trotsk')
+    let user_id = localStorage.getItem('user_id')
     try {
       const {
         name,
@@ -101,11 +168,25 @@ export default function ClientRegister() {
         maritial_status,
         phone,
         email,
-        user
+        user,
+        mother_name,
+        already,
+        welfare_state,
+        welfare_state_type,
+        genre,
+        family,
+        street,
+        number,
+        complement,
+        CEP,
+        reference,
+        neighborhood,
+        city,
+        state
       } = dataForm;
-
+      
       const clientResponse = await axios.post(
-        'http://bequegddsooder-env.eba-fas23u33.sa-east-1.elasticbeanstalk.com/clients',
+        'http://localhost/clients',
         {
           name,
           birthday,
@@ -114,59 +195,64 @@ export default function ClientRegister() {
           maritial_status,
           phone,
           email,
-          kinships: selectedClientKinshipsSendForm,
-          user
+          mother_name,
+          user:user_id,
+          already,
+          welfare_state,
+          welfare_state_type,
+          genre,
+          family,
+          street,
+          number,
+          complement,
+          CEP,
+          reference,
+          neighborhood,
+          city,
+          state
         },
         {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
+            Authorization: 'bearer ' +  token
           },
         }
       );
-
       if (clientResponse.status === 201) {
-        setAlertModalSuccess(true);
-        setDataForm(initialData);
+        setModalMessage(clientResponse.data.message)
+        setDataForm(initialDataSanitize);
+        setSanitize(true)
+        setIsOpen(true)
+        setFieldsUpdated(fieldsUpdated + 1); // Step 2
       } else {
-        setAlertModalError(true);
+        setModalMessage(clientResponse.data.message)
+        setIsOpen(true)
       }
     } catch (error) {
       console.error(error);
-      setAlertModalError(true);
+      setIsOpen(true)
     }
   };
 
   const handleForm = (value: React.ChangeEvent<HTMLInputElement>) => {
     const index = value.target.id;
     let tempValue = value.target.value;
-    let tempData = { ...dataForm }; // Crie uma cópia do objeto dataForm
-
+    let tempData = { ...dataForm };
     tempData = { ...tempData, [index]: tempValue };
-
     setDataForm(tempData);
   };
 
 
-  const handleFormSelect = (value: string) => {
-    const selectedValue = value.trim() !== '' ? value : null; // Definir como null se o valor estiver vazio
-    let prevDataForm = { ...dataForm, maritial_status: selectedValue };
+  const handleFormSelect = (value: string, id: string) => {
+    const selectedValue = value.trim() !== '' ? value : null;
+    let prevDataForm = { ...dataForm, [id]: selectedValue };
     setDataForm(prevDataForm);
   };
 
-  const handleFormCalendar = (value: string) => {
-    let prevDataForm = { ...dataForm, birthday: value };
+  const handleFormCalendar = (value: string , id:string) => {
+    let prevDataForm = { ...dataForm, [id]: value };
     setDataForm(prevDataForm);
-  };
-
-  const handleSelectedClientKinships = (selectedKinships: KinshipList[]) => {
-    const modifiedKinships = selectedKinships.map((kinship) => ({
-      ...kinship,
-      client: kinship.client?.client_id || null, // Replace nested object with client_id or null
-      kin: kinship.kin?.client_id || null, // Replace nested object with client_id or null
-    }));
-    setSelectedClientKinshipsSendForm(modifiedKinships as [])
-    setSelectedClientKinships(selectedKinships)
   };
 
   useEffect(() => {
@@ -174,86 +260,146 @@ export default function ClientRegister() {
     setDataForm(prevDataForm);
   }, [selectedClientKinships])
 
+  // useEffect(() => {
+  //   console.log('dataForm');
+  //   console.log(dataForm);
+  // }, [dataForm])
+
+  const reallyDestroyIt = async (id: number) => {
+    setIsOpen(true)
+    setModalMessage('voce deseja excluir esse beneficiado?')
+    setClientsToDestroy(id)
+  }
+
+  const closeModal = () => {
+    setIsOpen(false)
+  };
+
+  useEffect(() => {
+    if(!localStorageValues) {
+      setLocalStorageValues(true)
+      let id = localStorage.getItem('id')
+      setLocalStorageUserId(id as string)
+    }
+  }, [localStorageValues])
+
   return (
-    <MainCtnHorizontal>
-      <Header />
-      <div id="container-principal" className='flex pt-5 w-full'>
-        <SideMenu />
-        <Content>
-          <h1 className='text-3xl pb-2 pt-2'>cadastro de beneficiado</h1>
-          <h3 className='text-xl pb-2 pt-2'><BsPersonVcard className="inline-block text-blue-500" /> dados pessoais</h3>
-          <hr className='mb-2 mt-4' />
-          <span className="inline-block max-w-full sm:w-full md:w-full pt-4" >
-            <InputTextForms id={'name'} label="Nome Completo" value={dataForm.name} onChange={(e) => handleForm(e)} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
-            <InputTextForms id={'RG'} label="RG" value={dataForm.RG} onChange={(e) => handleForm(e)} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
-            <InputTextForms id={'CPF'} label="CPF" value={dataForm.CPF} onChange={(e) => handleForm(e)} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-4/12 md:pr-1 pt-4" >
-            <InputSelect id={'maritial_status'} label="Estado Civil" value={dataForm.maritial_status} onChange={(e) => handleFormSelect(e)} options={maritial_status_options} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-4/12 md:pl-1 pt-4" >
-            <InputSelect id={'gender'} label="Sexo" value={dataForm.maritial_status} onChange={(e) => handleFormSelect(e)} options={genre_options} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-4/12 md:pl-1 pt-4" >
-            <InputCalendarForm
-              id={'birthday'}
-              label="Data de Nascimento"
-              value={dataForm.birthday}
-              onChange={handleFormCalendar}
-            />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-full pt-4" >
-            <InputTextForms id={'mother_name'} label="Nome Completo da Mãe" value={dataForm.name} onChange={(e) => handleForm(e)} />
-          </span>
-          <hr />
-          <span className="inline-block sm:w-full md:w-full pt-2" >
-            <InputTextArea id={'observations'} label={'quantos filhos? Sexo e idades'} onChange={(e) => handleForm(e)} ></InputTextArea>
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
-            <InputSelect id={'gender'} label="Recebe algum auxílio?" value={dataForm.maritial_status} onChange={(e) => handleFormSelect(e)} options={welfarestate_status_options} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
-            <InputSelect id={'gender'} label="Já foi atendido antes?" value={dataForm.maritial_status} onChange={(e) => handleFormSelect(e)} options={welfarestate_status_options} />
-          </span>
-          <h3 className='text-xl pb-2 pt-6'><BsTelephoneOutbound className="inline-block text-blue-500" /> Contato</h3>
-          <hr />
-          <span className="inline-block max-w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
-            <InputTextForms id={'phone'} label="Telefone" value={dataForm.phone} onChange={(e) => handleForm(e)} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
-            <InputTextForms id={'email'} label="Email" value={dataForm.email} onChange={(e) => handleForm(e)} />
-          </span>
-          <span className="inline-block max-w-full sm:w-full md:w-full md:pr-1 pt-4" >
-            <h3 className='text-xl pb-2 pt-6'><BsHouse className="inline-block text-blue-500" /> Endereço</h3>
-            <AddressesList addressesProp={[]} value={() => {}} /> 
-          </span>
-          <span className="block mr-auto ml-auto sm:w-full md:w-6/12 md:pr-1 pt-4" >
-            <Btn onClick={() => sendForm()}><AiFillSave className="inline-block" /> Registrar </Btn>
-          </span>
-        </Content>
-        <ModalSm isOpen={alertModalSucess}>
-          <span className="absolute" style={{ right: 5, top: 10 }}>
-            <BtnR onClick={() => setAlertModalSuccess(false)}><AiOutlineCloseCircle style={{ fontSize: '24px', marginTop: '8px' }} /></BtnR>
-          </span>
-          <span className="flex flex-col items-center justify-items-center content-center pt-20">
-            <FiAlertTriangle className="text-2xl mb-3" />
-            <h1 className="uppercase mb-3 text-lg"> Beneficiado cadastrado com sucesso! </h1>
-          </span>
-        </ModalSm>
-        <ModalSm isOpen={alertModalError}>
-          <span className="absolute" style={{ right: 5, top: 10 }}>
-            <BtnR onClick={() => setAlertModalError(false)}><AiOutlineCloseCircle style={{ fontSize: '24px', marginTop: '8px' }} /></BtnR>
-          </span>
-          <span className="flex flex-col items-center justify-items-center content-center pt-20">
-            <FiAlertTriangle className="text-2xl mb-3" />
-            <h1 className="uppercase mb-3 text-lg"> Algo não ocorreu como devia! <br /><b>Beneficiado não cadastrado</b></h1>
-          </span>
-        </ModalSm>
-      </div>
-    </MainCtnHorizontal>
+    <>
+      <AuthCheck>
+      <MainCtnHorizontal>
+        <Header />
+        <div id="container-principal" className='flex pt-5 w-full'>
+          <SideMenu />
+          <Content>
+            <h1 className='text-3xl pb-2 pt-2'>cadastro de beneficiado</h1>
+            <h3 className='text-xl pb-2 pt-2'><BsPersonVcard className="inline-block text-blue-500" /> dados pessoais</h3>
+            <hr className='mb-2 mt-4' />
+            <span className="inline-block w-full sm:w-full md:w-full pt-4" >
+              <InputTextForms id={'name'} label="Nome Completo" value={dataForm.name} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputTextForms id={'RG'} label="RG" value={dataForm.RG} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
+              <InputTextForms id={'CPF'} label="CPF" value={dataForm.CPF} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputSelect id={'maritial_status'} label="Estado Civil" value={dataForm.maritial_status} onChange={(e) => handleFormSelect(e, 'maritial_status')} options={maritial_status_options}  key={fieldsUpdated}/>
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pl-1 pt-4">
+              <InputSelect
+                id={'genre'}
+                label="Sexo"
+                value={!sanitize ? dataForm.genre : null}
+                onChange={(e) => handleFormSelect(e, 'genre')}
+                options={genre_options}
+                key={fieldsUpdated} // Step 3
+              />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputCalendarForm
+                id={'birthday'}
+                label="Data de Nascimento"
+                value={dataForm.birthday}
+                onChange={(e) => handleFormCalendar(e , 'birthday')}
+                key={fieldsUpdated}
+              />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-full pt-4" >
+              <InputTextForms id={'mother_name'} label="Nome Completo da Mãe" value={dataForm.mother_name} onChange={(e) => handleForm(e)} />
+            </span>
+            <hr />
+            <span className="inline-block w-full sm:w-full md:w-full pt-2" >
+              <InputTextArea id={'family'} label={'quantos filhos? Sexo e idades'} onChange={(e) => handleForm(e)} sanitize={sanitize} key={fieldsUpdated}>
+                {
+                  dataForm.family 
+                }
+              </InputTextArea>
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputSelect id={'welfare_state'} label="Recebe algum auxílio?" value={dataForm.welfare_state} onChange={(e) => handleFormSelect(e, 'welfare_state')} options={welfarestate_status_option}  key={fieldsUpdated}/>
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
+              <InputTextForms id={'welfare_state_type'} label="Quais auxílios?" value={dataForm.welfare_state_type} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputSelect id={'already'} label="Já foi atendido antes?" value={dataForm.already} onChange={(e) => handleFormSelect(e, 'already')} options={welfarestate_status_option}  key={fieldsUpdated} />
+            </span>
+            <h3 className='text-xl pb-2 pt-6'><BsTelephoneOutbound className="inline-block text-blue-500" /> Contato</h3>
+            <hr />
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputTextForms id={'phone'} label="Telefone" value={dataForm.phone} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
+              <InputTextForms id={'email'} label="Email" value={dataForm.email} onChange={(e) => handleForm(e)} />
+            </span>
+
+            <h3 className='text-xl pb-2 pt-2'><BsPersonVcard className="inline-block text-blue-500" /> Endereço</h3>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputTextForms id={'CEP'} label="CEP" value={dataForm.CEP} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
+              <InputTextForms id={'street'} label="Rua" value={dataForm.street} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputTextForms id={'number'} label="Número" value={dataForm.number} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
+              <InputTextForms id={'neighborhood'} label="Bairro" value={dataForm.neighborhood} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-full pt-4" >
+              <InputTextArea id={'complement'} label="Complemento" onChange={(e) => handleForm(e)} sanitize={sanitize} key={fieldsUpdated}>
+                {
+                  dataForm.complement
+                }
+              </InputTextArea>
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputTextForms id={'reference'} label="Referência" value={dataForm.reference} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pl-1 pt-4" >
+              <InputTextForms id={'city'} label="Cidade" value={dataForm.city} onChange={(e) => handleForm(e)} />
+            </span>
+            <span className="inline-block w-full sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <InputTextForms id={'state'} label="Estado" value={dataForm.state} onChange={(e) => handleForm(e)} />
+            </span>
+
+            <span className="block mr-auto ml-auto sm:w-full md:w-6/12 md:pr-1 pt-4" >
+              <Btn onClick={() => sendForm()}><AiFillSave className="inline-block" /> Registrar </Btn>
+            </span>
+          </Content>
+        </div>
+      </MainCtnHorizontal>
+      <ModalCTN isOpen={isOpen}>
+        <span className="absolute" style={{ right: 5, top: 10 }}>
+          <BtnR onClick={() => setIsOpen(false)}><AiOutlineCloseCircle style={{ fontSize: '24px', marginTop: '8px' }} /></BtnR>
+        </span>
+        <span className="flex flex-col items-center justify-items-center content-center pt-20">
+          <FiAlertTriangle className="text-2xl mb-3" />
+          <h1 className=" mb-3 text-lg">{modalMessage}</h1>
+        </span>
+      </ModalCTN>
+      </AuthCheck>
+    </>
   );
 }

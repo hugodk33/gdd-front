@@ -1,0 +1,12 @@
+version: 2
+services:
+  web:
+    image: 'node:14'
+    env:
+      - NODE_ENV=production
+    build:
+      public: './public'
+    command:
+      - 'npm install'
+      - 'npm run deploy'  
+      - 'npm run start'   

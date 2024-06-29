@@ -15,7 +15,7 @@ const ModaLXStyle = {
         transform: 'translate(-50%, -50%)',
         zIndex: '9999',
         minWidth: 300,
-        minHeight: 300,
+        height: '300px',
         width: '60%'
     },
     overlay: {

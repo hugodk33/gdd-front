@@ -78,8 +78,7 @@ body a, body li, body p , body span {
   width: 100%
 }
 
-#side-menu li , #side-menu a{
-  width: 100%;
+#side-menu li , #side-menu a {
   display: flex;
 }
 
@@ -97,12 +96,92 @@ body a, body li, body p , body span {
   margin: 15px auto;
 }
 
+@media (min-width: 768px) and (max-width: 3000px) {
+  #container-principal {
+    flex-direction: row;
+  } 
+  #side-menu li , #side-menu a{
+    width: 100%;
+    display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  #container-principal {
+    flex-direction: column;
+  } 
+  #side-menu li , #side-menu a{
+    width: 60px;
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 7px;
+    text-align: center;
+    padding: 0;
+    justify-content: space-evenly;
+  }
+  #side-menu {
+    margin-top: -20px
+  }
+  #side-menu svg{
+    font-size: 13px;
+  }
+  #side-menu ul{
+    flex-direction: row;
+    justify-content: center;
+  }
+  .listes {
+    flex-direction: column ! important;
+  }
+  .liste-btns {
+    flex-direction: row ! important;
+    margin-top: 10px;
+    max-width: 240px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  h1 {
+    font-size:18px ! important
+  }
+  h3 {
+    font-size:12px ! important
+  }
+  .date-input {
+    margin-top: 1rem;
+  }
+}
+
 input , select {
   font-size: 18px ! important;
-  text-transform: capitalize ! important;
 }
 
 label {
-  text-transform: uppercase;
   font-weight: bold;
+  text-transform: uppercase;
+}
+
+#load {
+  margin: 0 auto;
+  position: absolute;
+  left: Calc(50% - 15px);
+  top: 50vh;
+  animation: loading 2.5s infinite;
+}
+
+#load svg {
+  width: 40px;
+  height: 40px;
+}
+.react-datepicker-popper {
+  z-index: 11 ! important;
+}
+
+@keyframes loading {
+  from {transform: rotate(0deg) }
+  to {transform: rotate(360deg) }
+}
+
+.ReactModal__Content {
+  height: 400px ! important;
 }

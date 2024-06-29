@@ -12,7 +12,10 @@ import axios from 'axios';
 import { FiEdit } from 'react-icons/fi';
 import transformDateFormat from '@/helpers/dataFormat';
 import { usePathname } from 'next/navigation'
-import { AiOutlineCalendar, AiOutlineClockCircle, AiOutlineOrderedList } from 'react-icons/ai';
+import { AiOutlineCalendar, AiOutlineClockCircle, AiOutlineMail, AiOutlineOrderedList, AiOutlinePhone } from 'react-icons/ai';
+import Link from 'next/link';
+import { BiArrowBack, BiMap, BiSolidUserAccount } from 'react-icons/bi';
+import AuthCheck from '@/components/authCheck/authcheck';
 
 interface Service {
     service_id?: number | null | undefined;
@@ -38,56 +41,85 @@ const initialServiceData: Service = {
     date: ''
 };
 
-interface Client {
-    client_id?: number | null | undefined;
+type Client = {
+    client_id?: number | null;
     name?: string | null;
     birthday?: string | null;
-    RG?: number | null;
-    CPF?: number | null;
-    phone?: number | null;
+    RG?: number | null | string;
+    CPF?: number | null | string;
+    maritial_status?: string | number | null | undefined;
     email?: string | null;
-    maritial_status?: string | null;
-    address?: number | null;
-}
+    phone?: number | null | string;
+    user?: number | string | null;
+    genre?: string | null;
+    family?: string | null;
+    already?: string | null;
+    welfare_state?: string | null;
+    welfare_state_type?: string | null;
+    street?: string | null;
+    number?: string | null | string;
+    neighborhood?: string | null;
+    CEP?: string | null;
+    mother_name?: string | null;
+    reference?: string | null;
+    complement?: string | null;
+    state?: string | null;
+    city?: string | null;
+};
 
 const initialClientData: Client = {
-    client_id: null,
-    name: null,
-    birthday: null,
-    RG: null,
-    CPF: null,
-    phone: null,
-    email: null,
-    maritial_status: null,
-    address: null
-}
+    name: '',
+    birthday: '',
+    RG: '',
+    CPF: '',
+    maritial_status: '',
+    email: '',
+    phone: '',
+    user: '',
+    genre: '',
+    family: '',
+    already: '',
+    welfare_state: '',
+    welfare_state_type: '',
+    street: '',
+    number: '',
+    neighborhood: '',
+    CEP: '',
+    mother_name: '',
+    reference: '',
+    complement: '',
+    state: '',
+    city: ''
+};
 
 export default function clientSearch() {
     //const [searchClientValue, setSearchClientValue] = useState<string>('')
     const [client, setClient] = useState<Client[]>([])
     const [services, setServices] = useState<Service[]>([])
     const [currentPage, setCurrentPage] = useState(1);
-    const [ , setTotal] = useState(0);
+    const [, setTotal] = useState(0);
 
     const pathname = usePathname()
     const parts = pathname.split('/')
     const idx = parts[2]
-    const HistoricSearch = async () => {
 
+    const HistoricSearch = async () => {
+        let token = localStorage.getItem('trotsk')
         try {
-            const response = await axios.get(`${ process.env.DB_USER }/historics/search/`, {
+            const response = await axios.get(`http://localhost/clients/search/`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    Authorization: 'bearer ' + token
                 },
                 params: {
-                    historic_id: idx,
+                    id: idx,
                     perPage: 10,
                     page: 1,
                 }
             });
             setServices(response.data.service)
-            setClient([response.data.client])
+            setClient([response.data.client.data[0]])
             setTotal(response.data.total)
         } catch (error) {
             console.error(error);
@@ -104,69 +136,102 @@ export default function clientSearch() {
 
     return (
         <section>
-            <MainCtnHorizontal>
-                <Header />
-                <div id="container-principal" className='flex pt-5 mb-5 w-full'>
-                    <SideMenu />
-                    <Content>
-                        {
-                            client.length > 0 ?
-                                client.map((a, b) => (
-                                    <span key={'client-historic-bio' + b}>
-                                        <h1 className='text-md pb-2 pt-2 text-gray-500'>Histórico de Beneficiados</h1>
-                                        <h1 className='text-2xl pb-2 pt-2' style={{ fontWeight: 600 }}>{a.name}</h1>
-                                        <hr className='mb-2 mt-4' />
-                                        <h3 className='text-sm bold uppercase pb-2 pt-2'>
-                                            <BsPersonVcard className='inline-block text-blue-500' /> Dados Pessoais
-                                        </h3>
-                                        <p className='flex items-center gap-1 uppercase mb-2' style={{ fontSize: 16, height: 45 }}>
-                                            <span className="text-blue-500 bold" style={{ fontSize: 18 }}>
-                                                ID
+            <AuthCheck>
+                <MainCtnHorizontal>
+                    <Header />
+                    <div id="container-principal" className='flex pt-5 mb-5 w-full'>
+                        <SideMenu />
+                        <Content>
+                            {
+                                client.length > 0 ?
+                                    client.map((a, b) => (
+                                        <>
+                                            <span className='block text-xl w-full flexmax-w-full sm:w-full mt-4 mb-4'>
+                                                <h1 className='text-3xl mt-1 '>{a?.name}</h1>
+                                                <h1 className='block text-2xl bolder' style={{ fontSize: 18 }}>{a?.genre}</h1>
+                                                <span className='flex items-center gap-2 mt-1 mb-1' style={{ fontSize: 12, height: 25 }}>
+                                                    <span className="text-blue-500 font-thin">
+                                                        <BiSolidUserAccount style={{ fontSize: 20 }} />
+                                                    </span>
+                                                    <h1 className='block bold' style={{ fontSize: 19 }}>CPF: {a?.CPF} | </h1>
+                                                    <h1 className='block semibold' style={{ fontSize: 19 }}>RG: {a?.RG}</h1>
+                                                </span>
+                                                <span className='flex items-center gap-2 mt-1 mb-1' style={{ fontSize: 12, height: 25 }}>
+                                                    <span className="text-blue-500 font-thin">
+                                                        <AiOutlinePhone style={{ fontSize: 20 }} />
+                                                    </span>
+                                                    <h1 className='block' style={{ fontSize: 19 }}>{a?.phone}</h1>
+                                                </span>
+                                                <span className='flex items-center gap-2 mt-1 mb-1' style={{ fontSize: 19, height: 25 }}>
+                                                    <span className="text-blue-500 font-thin">
+                                                        <AiOutlineMail style={{ fontSize: 20 }} />
+                                                    </span>
+                                                    <h1 className='block' style={{ fontSize: 19 }}>{a?.email}</h1>
+                                                </span>
                                             </span>
-                                            <span className="bg-gray-100 uppercase rounded-md block w-full text-center mt-4 mb-2" style={{ fontSize: 23 }} >
-                                                {a.client_id}
+                                            <p className='flex w-full items-center gap-1' style={{ fontSize: 16, height: 45 }}>
+                                                <span className="text-blue-500 font-thin">
+                                                    <BiMap style={{ fontSize: 20 }} />
+                                                </span>
+                                                {a.street ? a.street : ' --- '}
+                                                {' , '}
+                                                {a.number ? a.number : ' --- '}
+                                                {' , '}
+                                                {a.neighborhood ? a.neighborhood : ' --- '}
+                                                {' , '}
+                                                {a.CEP ? a.CEP : ' --- '}
+                                            </p>
+                                            <hr className='w-full mt-4 mb-4' />
+                                            <span className='flex flex-col w-full items-center gap-2 ' style={{ fontSize: 19 }}>
+                                                <span className="w-full text-blue-500 font-thin">
+                                                    Situação familiar
+                                                </span>
+                                                <h1 className='flex w-full ' style={{ fontSize: 19 }}>{a?.family}</h1>
                                             </span>
-                                            <span className="text-blue-500">
-                                                <AiOutlineCalendar style={{ fontSize: 18 }} />
+                                            <hr className='w-full mt-4 mb-4' />
+                                            <span className='flex w-full flex-row'>
+                                                <span className='flex w-full flex-col md:w-4/12 gap-2 '>
+                                                    <span className="text-blue-500 font-thin">
+                                                        Já foi atendido?
+                                                    </span>
+                                                    <h1 className='flex w-full' style={{ fontSize: 19 }}>{a?.already}</h1>
+                                                </span>
+                                                <span className='flex flex-col w-full md:w-4/12 gap-2 '>
+                                                    <span className="text-blue-500 font-thin">
+                                                        Recebe auxílio?
+                                                    </span>
+                                                    <h1 className='block' style={{ fontSize: 19 }}>{a?.welfare_state}</h1>
+                                                </span>
+                                                <span className='flex flex-col w-full md:w-4/12 gap-2 '>
+                                                    <span className="text-blue-500 font-thin">
+                                                        Qual auxílio??
+                                                    </span>
+                                                    <h1 className='block' style={{ fontSize: 19 }}>{a?.welfare_state_type}</h1>
+                                                </span>
                                             </span>
-                                            <span className="bg-gray-100 uppercase rounded-md block w-full text-center mt-4 mb-2" style={{ fontSize: 23 }} >
-                                                {transformDateFormat(a.birthday as string)}
+                                            <span className='flex w-full flex-col md:flex-row mt-5'>
+                                                <span className='md:w-6/12 w-full p-2'>
+                                                    <Link className='btn-p w-full items-center block text-white font-semibold  bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2' href={`/beneficiado/editar/${a.client_id}`} style={{ maxWidth: 300 }}>
+                                                        <FiEdit className="text-2xl mb-3" style={{ fontSize: 20, marginTop: 4, display: 'inline' }} />
+                                                        EDITAR BENEFICIADO
+                                                    </Link >
+                                                </span>
+                                                <span className='md:w-6/12 w-full p-2'>
+                                                    <Link className='btn-p w-full items-center block text-white font-semibold  bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2' href={`/beneficiado/historico/${a.client_id}`} style={{ maxWidth: 300 }}>
+                                                        <BsEye className="text-2xl mb-3" style={{ fontSize: 20, marginTop: 4, display: 'inline' }} />
+                                                        VER HISTÓRICO
+                                                    </Link >
+                                                </span>
                                             </span>
-                                        </p>
-                                        <p className='flex items-center gap-1 uppercase mb-3' style={{ fontSize: 16, height: 45 }}>
-                                            <span className="text-blue-500 bold" style={{ fontSize: 18 }}>
-                                                CPF
-                                            </span>
-                                            <span className="bg-gray-100 uppercase rounded-md block w-full text-center mt-4 mb-2" style={{ fontSize: 23 }} >
-                                                {a.CPF}
-                                            </span>
-                                            <span className="text-blue-500 bold" style={{ fontSize: 18 }}>
-                                                RG
-                                            </span>
-                                            <span className="bg-gray-100 uppercase rounded-md block w-full text-center mt-4 mb-2" style={{ fontSize: 23 }} >
-                                                {a.RG}
-                                            </span>
-                                        </p>
-                                    </span>
-                                )) : null
-                        }
-                        <span className='flex w-full md:pr-1 mt-2 pt-4'>
-                            <span className='flex sm:w-full md:w-6/12 md:pr-1 mt-2 pt-4'>
-                                <Btn
-                                    onClick={() => {}}
-                                >
-                                    <FiEdit style={{ fontSize: '24px' }}  className='inline-block' /> Editar
-                                </Btn>
-                            </span>
-                            <span className='flex sm:w-full md:w-6/12 md:pl-1 mt-2 pt-4'>
-                                <BtnOutline>
-                                    <AiOutlineOrderedList style={{ fontSize: '24px' }}  className='inline-block' /> Histórico          
-                                </BtnOutline>
-                            </span>
-                        </span>
-                    </Content>
-                </div>
-            </MainCtnHorizontal>
+                                        </>
+                                    ))
+                                    : null
+                            }
+
+                        </Content>
+                    </div>
+                </MainCtnHorizontal>
+            </AuthCheck>
         </section>
     );
 }

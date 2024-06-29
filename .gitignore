@@ -1,0 +1,94 @@
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+venv/
+env/
+*.venv/
+*.env/
+__pycache__/
+
+# Arquivos de configuração
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.db
+*.sqlite3
+
+# Dependências
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de log
+*.log
+
+# Arquivos gerados
+dist/
+build/
+*.egg-info/
+*.egg
+*.egg-info
+*.pyc
+*.pyo
+*.swp
+*.o
+*.log
+*.bak
+*.tmp
+
+# IDE / Editor
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# Ambiente virtual
+env/
+
+# Arquivos de configuração específicos para o sistema operacional
+*.DS_Store
+Thumbs.db
+
+# Arquivos de configuração específicos para editores
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+.komodotools/
+.vscode/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Ambiente Anaconda
+.env
+
+# Arquivos de cache do Pipenv
+.pipenv
+.Pipfile.lock
+
+# Diretório de upload Heroku
+*.idea/
+
+# Diretório de upload Heroku
+.DS_Store
+
+# Diretório de upload Heroku Node
+node_modules/
+
+# Diretório de upload Heroku Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Diretório de upload Heroku VS Code
+.vscode/
+.next/

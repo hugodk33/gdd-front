@@ -1,5 +1,6 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
+import AuthCheck from '../components/authCheck/authcheck'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,9 +14,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          { children }
+        </body>
     </html>
   )
 }
+
+//</AuthCheck>
+
+// interface Service {
+//   username?: string | undefined;
+//   password?: string | null;
+// }

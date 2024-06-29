@@ -1,13 +1,5 @@
 module.exports = {
   trailingSlash: false,
-  experimental: {
-    images: {
-      unoptimized: true
-    }
-  },
-  server: {
-    port: 80
-  },
   async headers() {
     return [
       {
@@ -23,9 +15,24 @@ module.exports = {
   },
   async redirects() {
     return [];
-  },
+  }
+};
+
+module.exports = {
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
 };
+// **
+//  * @type {import('next').NextConfig}
+//  */
+// const nextConfig = {
+//   output: 'export',
+//   // Optional: Add a trailing slash to all paths `/about` -> `/about/`
+//   // trailingSlash: true,
+//   // Optional: Change the output directory `out` -> `dist`
+//   // distDir: 'dist',
+// }
+ 
+// module.exports = nextConfig
