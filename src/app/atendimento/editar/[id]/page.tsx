@@ -154,7 +154,7 @@ export default function Service() {
             } = dataForm;
 
             const clientResponse = await axios.put(
-                `http://localhost/services/edit/${idx}`,
+                `http://back.ongprograma.org/services/edit/${idx}`,
                 {
                     type,
                     title,
@@ -192,7 +192,7 @@ export default function Service() {
     const searchService = async () => {
         let token = localStorage.getItem('trotsk')
         try {
-            const response = await axios.get(`http://localhost/services/search/${idx}`, {
+            const response = await axios.get(`http://back.ongprograma.org/services/search/${idx}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

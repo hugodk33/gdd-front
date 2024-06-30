@@ -154,7 +154,7 @@ export default function Service() {
       } = dataForm;
       let user_id = localStorage.getItem('user_id')
       const clientResponse = await axios.post(
-        `http://localhost/services`,
+        `http://back.ongprograma.org/services`,
         {
           title,
           observations,
@@ -193,7 +193,7 @@ export default function Service() {
   const sendFormCPF = async () => {
     let token = localStorage.getItem('trotsk')
     try {
-      const response = await axios.get(`http://localhost/clients/cpf`, {
+      const response = await axios.get(`http://back.ongprograma.org/clients/cpf`, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

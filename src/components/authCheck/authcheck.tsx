@@ -24,7 +24,7 @@ export default function AuthCheck({
         try {
             const token = localStorage.getItem('nekot')
             const clientResponse = await axios.post(
-                'http://localhost/sessions/check',
+                'http://back.ongprograma.org/sessions/check',
                 {
                     token
                 },

@@ -191,7 +191,7 @@ export default function ClientRegister() {
             } = dataForm;
 
             const clientResponse = await axios.put(
-                `http://localhost/clients/edit/${idx}`,
+                `http://back.ongprograma.org/clients/edit/${idx}`,
                 {
                     name,
                     birthday,
@@ -243,7 +243,7 @@ export default function ClientRegister() {
     const searchClient = async () => {
         let token = localStorage.getItem('trotsk')
         try {
-            const response = await axios.get(`http://localhost/clients/search`, {
+            const response = await axios.get(`http://back.ongprograma.org/clients/search`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

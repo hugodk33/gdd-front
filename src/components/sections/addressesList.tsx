@@ -73,7 +73,7 @@ export default function AddressesList({
     const searchClient = async () => {
 
         try {
-            const response = await axios.get(`http://localhost/address/search`, {
+            const response = await axios.get(`http://back.ongprograma.org/address/search`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

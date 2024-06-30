@@ -47,7 +47,7 @@ export default function clientSearch() {
   const searchService = async () => {
     let token = localStorage.getItem('trotsk')
     try {
-      const response = await axios.get(`http://localhost/clients/search`, {
+      const response = await axios.get(`http://back.ongprograma.org/clients/search`, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -95,7 +95,7 @@ export default function clientSearch() {
   const destroyIt = async (id: number) => {
     let token = localStorage.getItem('trotsk');
     try {
-      await axios.delete(`http://localhost/clients/delete/${id}`, {
+      await axios.delete(`http://back.ongprograma.org/clients/delete/${id}`, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

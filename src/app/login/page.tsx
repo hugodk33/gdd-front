@@ -31,7 +31,7 @@ export default function Home() {
       } = dataForm;
 
       const clientResponse = await axios.post(
-        'http://back.ongprograma.org:3333/sessions',
+        'http://back.ongprograma.org/sessions',
         {
           username,
           password

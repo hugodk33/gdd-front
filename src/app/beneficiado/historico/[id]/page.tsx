@@ -125,7 +125,7 @@ export default function clientSearch() {
   const HistoricSearch = async () => {
     let token = localStorage.getItem('trotsk')
     try {
-      const response = await axios.get(`http://localhost/historics/search/`, {
+      const response = await axios.get(`http://back.ongprograma.org/historics/search/`, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',

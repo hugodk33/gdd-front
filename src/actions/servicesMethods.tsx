@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const sendServiceForm = () => {
     // try {
-    //   const response = axios('http://localhost/services', {
+    //   const response = axios('http://back.ongprograma.org/services', {
     //     method: 'POST',
     //     params: {
     //       title: dataForm.title,

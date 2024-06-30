@@ -186,7 +186,7 @@ export default function ClientRegister() {
       } = dataForm;
       
       const clientResponse = await axios.post(
-        'http://localhost/clients',
+        'http://back.ongprograma.org/clients',
         {
           name,
           birthday,

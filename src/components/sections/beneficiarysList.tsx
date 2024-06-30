@@ -86,7 +86,7 @@ export default function BeneficiarysList({
     const searchClient = async () => {
         let token = localStorage.getItem('trotsk')
         try {
-            const response = await axios.get(`http://localhost/clients/search`, {
+            const response = await axios.get(`http://back.ongprograma.org/clients/search`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

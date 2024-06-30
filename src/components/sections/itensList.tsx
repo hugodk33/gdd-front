@@ -76,7 +76,7 @@ export default function itensList({
 
     const searchClient = async () => {
         try {
-            const response = await axios.get(`http://localhost/clients/search`, {
+            const response = await axios.get(`http://back.ongprograma.org/clients/search`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

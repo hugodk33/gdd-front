@@ -204,7 +204,7 @@ export default function ClientEdtForm() {
             let user_id = localStorage.getItem('user_id')
             const clientResponse = await axios.put(
 
-                `http://localhost/services/dispatch/${idx}`,
+                `http://back.ongprograma.org/services/dispatch/${idx}`,
                 {
                     status,
                     dispatch_observations,
@@ -237,7 +237,7 @@ export default function ClientEdtForm() {
     const searchService = async () => {
         let token = localStorage.getItem('trotsk')
         try {
-            const response = await axios.get(`http://localhost/services/search/${idx}`, {
+            const response = await axios.get(`http://back.ongprograma.org/services/search/${idx}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
